@@ -5,12 +5,12 @@
     <title>Willpower builder game</title>
   </head>
   <body>
+    <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
     <script src="bower_components/riot/riot.min.js" charset="utf-8"></script>
     <script src="tags/main.js" charset="utf-8"></script>
     <main></main>
-
     <script type="text/javascript">
-      riot.mount('main')
+      riot.mount('main',{Firebase:Firebase})
     </script>
   </body>
 </html>

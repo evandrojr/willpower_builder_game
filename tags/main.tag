@@ -2,8 +2,33 @@
   <script src="../bower_components/jquery/dist/jquery.min.js" charset="utf-8"></script>
   <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js" charset="utf-8"></script>
   <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen" title="no title" charset="utf-8">
-  <h2>current week: {this.weekNumber}</h2>
+  <h2>Semana atual: {currentWeek}</h2>
 <hr>
+
+<div class="table-responsive">
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+      <td># semana</td><td>seg</td><td>ter</td><td>qua</td><td>qui</td><td>sex</td><td>sáb</td><td>dom</td><td>total semana</td><td>peso</td><td>alterar peso</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="r in rows">
+        <td>{this.week}</td>
+        <td data-week={this.week} data-day='1'>{this.monday}</td>
+        <td data-week={this.week} data-day='2'>{this.tuesday}</td>
+        <td data-week={this.week} data-day='3'>{this.wednesday}</td>
+        <td data-week={this.week} data-day='4'>{this.thursday}</td>
+        <td data-week={this.week} data-day='5'>{this.friday}</td>
+        <td data-week={this.week} data-day='6'>{this.saturday}</td>
+        <td data-week={this.week} data-day='7'>{this.sunday}</td>
+        <td>{this.total}</td>
+        <td>{this.weight}</td>
+        <td><input type="number" ng-model="weightInput[r.week]" ng-change="setWeight()" width="3" size="3"></td>
+      </tr>
+    </tbody>
+   </table>
+</div>
 
 <form class="form-horizontal" role="form">
   <div class="form-group">
@@ -12,13 +37,64 @@
       <input type="number" name="weekInput" id="weekInput" value="{this.weekInput}" onchange={setWeekInput} placeholder="Digite a semana"></br>
     </div>
   </div>
+
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="dayOfWeekInput">Dia da semana:</label>
+    <div class="col-sm-10">
+      <select name="dayOfWeekInput" id="dayOfWeekInput">
+         <option each={weekDays} value={id}>{name}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="TaskSelector">Atividade:</label>
+    <div class="col-sm-10">
+      <select id="TaskSelector" size="15" onchange={setPointsInput} >
+           <option each={tasks} value={id}>{descr}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="amountInput">Quantidade:</label>
+    <div class="col-sm-10">
+      <input type="number" ng-model="amountInput" id="amountInput" ng-change="setPointsInput()">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="pointsInput">Pontos:</label>
+    <div class="col-sm-10">
+      <input type="number" ng-model="pointsInput" id="pointsInput" readonly=true>
+    </div>
+  </div>
+
 </form>
+  <div class="col-sm-4">
+    <button class="btn btn-default" ng-click="addTask()" >
+      Guardar
+    </button>
+    <!-- <button class="btn btn-default" ng-click="clearData()" >
+      Limpar memória
+    </button>
+    <button class="btn btn-default" ng-click="saveData()" >
+      Salvar na nuvem
+    </button>
+    <button class="btn btn-default" ng-click="loadData()" >
+      Carregar dados da nuvem
+    </button>  -->
+    <button class="btn btn-default" ng-click="renderResults()" >
+      Atualizar tela
+    </button>
+  </div>
+</form>
+
 var v = this;
-v.weekNumber = getWeekNumber()
-v.weekInput = v.weekNumber;
-
-
-
+var data = new Firebase('https://radiant-torch-5597.firebaseio.com/');
+v.currentWeek = getWeekNumber()
+v.weekInput = v.currentWeek
+v.amountInput.value = 1
 
 // Add new tasks to the end
 // Do not change the order since it task has a hidden id value
@@ -46,7 +122,7 @@ v.tasks=[
 ];
 v.dayOfWeekInput = {};
 
-v.dayOfWeekInput.weekDaysArr = [
+v.weekDays = [
     { id: 1, name: 'Segunda' },
     { id: 2, name: 'Terça' },
     { id: 3, name: 'Quarta' },
@@ -61,6 +137,89 @@ v.dayOfWeekInput.weekDaysArr = [
   //Adds ids for the tasks
   for (var i = 0; i < v.tasks.length; i++) {
     v.tasks[i].id = ++id
+  }
+
+  //{taskId:,  week:, dayOfWeek:, points:}
+  v.dayTasks = [];
+  v.daySum = [];
+  v.weekWeight = [];
+  v.registeredWeeks = [];
+  v.today = new Date();
+  v.todayDayOfWeek =  ( ((v.today.getDay() + 6) % 7 ) + 1) ; //monday = 1, sunday = 7
+
+  v.dayOfWeekInput.weekDays = v.todayDayOfWeek;
+  v.amountInput = 1;
+  v.setWeight = function(){
+    week = v.registeredWeeks[this.$index] ;
+    v.weekWeight[week]=parseInt(v.weightInput[week]);
+    v.saveData();
+    console.log(v.weekWeight);
+  }
+  loadDataFromFirebase();
+
+//////////////////// Start of Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+  function renderResults(){
+    v.dayTasks.sort(compareDayTask);
+    setDaySum();
+    setRegisteredWeeks();
+    v.rows = [];
+    console.log(v.registeredWeeks);
+    for(var i=0; i < v.registeredWeeks.length; ++i){
+       v.renderWeek(v.registeredWeeks[i]);
+    }
+  }
+
+  function setDaySum(){
+    v.daySum = [];
+    console.log(v.dayTasks);
+    for (var j = 0; j < v.dayTasks.length; j++){
+      var i = v.dayTasks[j];
+      if(v.daySum[i.week] === undefined)
+        v.daySum[i.week]=[];
+      if(v.daySum[i.week][i.dayOfWeek] === undefined)
+        v.daySum[i.week][i.dayOfWeek]=0;
+      v.daySum[i.week][i.dayOfWeek]+=i.points;
+      console.log(v.daySum[i.week][i.dayOfWeek]);
+     }
+    console.log(v.daySum);
+  };
+
+  function setRegisteredWeeks(){
+    v.registeredWeeks = [];
+    lastWeek=-1;
+    for (var j = 0; j < v.dayTasks.length; j++){
+      var i=v.dayTasks[j];
+      if(lastWeek!=i.week){
+        v.registeredWeeks.push(i.week);
+      }
+      lastWeek=i.week;
+    }
+  }
+
+  function loadDataFromFirebase(){
+      data.once("value", function(snapshot) {
+        dataSet=snapshot.val();
+        v.dayTasks = dataSet.tasks;
+        v.weekWeight = dataSet.weights;
+        console.log(dataSet);
+        //v.messages = JSON.stringify(dataSet);
+        renderResults();
+      }, function (err){
+        alert("Erro carregando dados da nuvem");
+      });
+  };
+
+  function compareDayTask(a,b) {
+    if (a.week < b.week)
+      return -1;
+    if (a.week > b.week)
+      return 1;
+    if(a.dayOfWeek < b.dayOfweek)
+       return -1;
+    if(a.dayOfWeek > b.dayOfweek)
+       return 1;
+    return 0;
   }
 
   function getWeekNumber() {
@@ -81,7 +240,5 @@ v.dayOfWeekInput.weekDaysArr = [
   setWeekInput(e) {
     v.weekInput = e.target.value
   }
-
-  console.log(v.tasks)
 
 </main>
