@@ -2,7 +2,7 @@
   <script src="../bower_components/jquery/dist/jquery.min.js" charset="utf-8"></script>
   <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js" charset="utf-8"></script>
   <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen" title="no title" charset="utf-8">
-  <h2>Semana atual: {currentWeek}</h2>
+  <h5>Semana atual: {currentWeek}</h5>
 <hr>
 
 <div class="table-responsive">
@@ -15,13 +15,13 @@
     <tbody>
       <tr each={calendar}>
         <td>{week}</td>
-        <td data-week={this.week} data-day='1'>{monday}</td>
-        <td data-week={this.week} data-day='2'>{tuesday}</td>
-        <td data-week={this.week} data-day='3'>{wednesday}</td>
-        <td data-week={this.week} data-day='4'>{thursday}</td>
-        <td data-week={this.week} data-day='5'>{friday}</td>
-        <td data-week={this.week} data-day='6'>{saturday}</td>
-        <td data-week={this.week} data-day='7'>{sunday}</td>
+        <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='1'>{monday}</td>
+        <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='2'>{tuesday}</td>
+        <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='3'>{wednesday}</td>
+        <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='4'>{thursday}</td>
+        <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='5'>{friday}</td>
+        <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='6'>{saturday}</td>
+        <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='7'>{sunday}</td>
         <td>{total}</td>
         <td ><input type="number" class="col-md-3"  onchange={setWeight} value={weight} size="3"></td>
       </tr>
@@ -72,7 +72,7 @@
 </form>
   <div class="col-sm-4">
     <button class="btn btn-default" onclick={addTask} >
-      Guardar
+        Adicionar tarefa
     </button>
     <!-- <button class="btn btn-default" ng-click="clearData()" >
       Limpar memória
@@ -82,17 +82,24 @@
     </button>
     <button class="btn btn-default" ng-click="loadData()" >
       Carregar dados da nuvem
-    </button>  -->
+    </button>
     <button class="btn btn-default" ng-click="renderResults()" >
       Atualizar tela
     </button>
+  -->
   </div>
 </form>
 
-var v = this;
-var data = new Firebase('https://radiant-torch-5597.firebaseio.com/');
-v.currentWeek = getWeekNumber()
-v.weekInput.value = v.currentWeek
+
+
+  var v = this;
+  if(Firebase != null){
+    var data = new Firebase('https://radiant-torch-5597.firebaseio.com/');
+  }else{
+    var data = null
+  }
+  v.currentWeek = getWeekNumber()
+  v.weekInput.value = v.currentWeek
 
 // Add new tasks to the end
 // Do not change the order since it task has a hidden id value
@@ -147,7 +154,9 @@ v.weekDays = [
   v.calendar = []
   v.dayOfWeekInput.weekDays = v.todayDayOfWeek;
   v.pointsInput.value = 2 // Should be v.amountInput.value * v.tasks[v.taskSelector.value].points
-  loadDataFromFirebase()
+  if(Firebase!=null){
+    loadDataFromFirebase()
+  }
   renderResults()
   ///////////////////////////// Start of Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
@@ -159,6 +168,9 @@ v.weekDays = [
   }
 
   function saveData(){
+    if(Firebase==null){
+      return
+    }
     //$scope.localBackup();
     dataSet={tasks: v.dayTasks, weights: v.weekWeight};
     data.set(dataSet);
@@ -296,6 +308,31 @@ v.weekDays = [
 
   setWeekInput(e) {
     v.weekInput.value = e.target.value
+  }
+
+  mouseOverCalendarCell(e) {
+      console.log(e.currentTarget)
+      var c = e.currentTarget
+      console.log($(c).data('day'))
+      var day = $(c).data('day')
+      var week = $(c).data('week')
+      displayDayActivities(week, day)
+  }
+
+  function displayDayActivities(week, day){
+    week = parseInt(week)
+    day = parseInt(day)
+    var activities = ""
+    for (var j = 0; j < v.dayTasks.length; j++){
+      var i = v.dayTasks[j];
+      if(i.week > week)
+        break
+      if(i.week == week && i.dayOfWeek == day){
+        activities+=v.tasks[i.taskId].descr + " " + v.tasks[i.taskId].points + "\n";
+      }
+    }
+    console.log(activities)
+    alert(activities)
   }
 
 </main>
