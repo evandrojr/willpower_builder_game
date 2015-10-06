@@ -9,7 +9,7 @@
   <table class="table table-bordered table-hover">
     <thead>
       <tr>
-      <td># semana</td><td>seg</td><td>ter</td><td>qua</td><td>qui</td><td>sex</td><td>sáb</td><td>dom</td><td>total semana</td><td>peso</td><td>alterar peso</td>
+      <td># semana</td><td>seg</td><td>ter</td><td>qua</td><td>qui</td><td>sex</td><td>sáb</td><td>dom</td><td>total semana</td><td>peso</td>
       </tr>
     </thead>
     <tbody>
@@ -23,8 +23,7 @@
         <td data-week={this.week} data-day='6'>{saturday}</td>
         <td data-week={this.week} data-day='7'>{sunday}</td>
         <td>{total}</td>
-        <td>{weight}</td>
-        <td><input type="number"  ng-change="setWeight()" width="3" size="3"></td>
+        <td><input type="number" onchange={setWeight} value={weight} width="3" size="3"></td>
       </tr>
     </tbody>
    </table>
@@ -42,7 +41,7 @@
     <label class="control-label col-sm-2" for="dayOfWeekInput">Dia da semana:</label>
     <div class="col-sm-10">
       <select name="dayOfWeekInput" id="dayOfWeekInput">
-         <option each={weekDays} value={id}>{name}</option>
+         <option each={weekDays} selected={id == todayDayOfWeek} value={id}>{name}</option>
       </select>
     </div>
   </div>
@@ -78,7 +77,7 @@
     <!-- <button class="btn btn-default" ng-click="clearData()" >
       Limpar memória
     </button>
-    <button class="btn btn-default" ng-click="saveData()" >
+    <button class="btn btn-default" noclick={saveData} >
       Salvar na nuvem
     </button>
     <button class="btn btn-default" ng-click="loadData()" >
@@ -146,19 +145,25 @@ v.weekDays = [
   v.today = new Date();
   v.todayDayOfWeek =  ( ((v.today.getDay() + 6) % 7 ) + 1) ; //monday = 1, sunday = 7
   v.calendar = []
-
   v.dayOfWeekInput.weekDays = v.todayDayOfWeek;
-  v.setWeight = function(){
-    week = v.registeredWeeks[this.$index] ;
-    v.weekWeight[week]=parseInt(v.weightInput[week]);
-    v.saveData();
-    console.log(v.weekWeight);
-  }
-
   v.pointsInput.value = 2 // Should be v.amountInput.value * v.tasks[v.taskSelector.value].points
   loadDataFromFirebase()
   renderResults()
   ///////////////////////////// Start of Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+  setWeight(e){
+    week = e.item.week
+    v.weekWeight[week]=parseInt(e.currentTarget.value)
+    saveData()
+    console.log(v.weekWeight)
+  }
+
+  function saveData(){
+    //$scope.localBackup();
+    dataSet={tasks: v.dayTasks, weights: v.weekWeight};
+    data.set(dataSet);
+    console.log(dataSet);
+  };
 
   setPointsInput(){
     //TODO make it better!
@@ -168,7 +173,7 @@ v.weekDays = [
   addTask(){
    v.dayTasks.push({taskId: parseInt(v.taskSelector.value), week: parseInt(v.weekInput.value), dayOfWeek: parseInt(v.dayOfWeekInput.value), points: parseInt(v.pointsInput.value) });
    renderResults();
-   //saveData();
+   saveData();
   };
 
   function renderResults(){
