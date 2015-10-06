@@ -23,7 +23,7 @@
         <td data-week={this.week} data-day='6'>{saturday}</td>
         <td data-week={this.week} data-day='7'>{sunday}</td>
         <td>{total}</td>
-        <td><input type="number" onchange={setWeight} value={weight} width="3" size="3"></td>
+        <td ><input type="number" class="col-md-3"  onchange={setWeight} value={weight} size="3"></td>
       </tr>
     </tbody>
    </table>
