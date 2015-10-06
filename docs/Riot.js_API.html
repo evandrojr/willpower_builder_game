@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<!-- saved from url=(0022)http://riotjs.com/api/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>
+    Custom tags · Riot.js 
+  </title>
+
+  
+
+  <!-- favicons -->
+  <link rel="shortcut icon" href="http://riotjs.com/img/favicon-152x152.png">
+  <link rel="icon" type="image/png" sizes="152x152" href="http://riotjs.com/img/favicon-152x152.png">
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://riotjs.com/img/favicon-152x152.png">
+
+  <!-- RSS
+  <link rel="alternate" type="application/atom+xml" title="Riot.js" href="/atom.xml">
+  -->
+
+  <!-- style -->
+  <link rel="stylesheet" href="http://riotjs.com/style.css">
+
+<style type="text/css"></style></head>
+
+<body id="" class="apidoc">
+
+  <div class="wrap">
+
+    <a id="fork" href="https://github.com/riot/riot">Fork me on GitHub</a>
+
+    <header id="header">
+      <span id="logo">
+        <a href="http://riotjs.com/"><img id="riot-logo" src="./Riot.js_API_files/riot120x.png"></a>
+        <strong>by</strong>
+        <a href="https://muut.com/"><img id="muut-logo" src="./Riot.js_API_files/muut.png"></a>
+      </span>
+
+      <nav id="nav">
+  <a href="http://riotjs.com/compare/">Compare</a>
+  <a href="http://riotjs.com/faq/">FAQ</a>
+  <a href="http://riotjs.com/guide/">Guide</a>
+  <a href="./Riot.js_API_files/Riot.js_API.html" class="current">API</a>
+  <a href="http://riotjs.com/download/">Download</a>
+  <a href="http://riotjs.com/forum/">Forum</a>
+</nav>
+
+    </header>
+
+    <main id="main">
+      <div id="tabs">
+  <a href="./Riot.js_API_files/Riot.js_API.html" class="current">Custom tags</a>
+  <a href="http://riotjs.com/api/compiler/">Compiler</a>
+  <a href="http://riotjs.com/api/observable/">Observable</a>
+  <a href="http://riotjs.com/api/route/">Router</a>
+  <a href="http://riotjs.com/api/misc/">Misc</a>
+</div>
+
+<h1>API · Custom tags</h1>
+
+<div id="toc"><p><a href="http://riotjs.com/api/#mounting">Mounting</a></p><p><a href="http://riotjs.com/api/#rendering">Rendering</a></p><p><a href="http://riotjs.com/api/#tag-instance">Tag instance</a></p><p><a href="http://riotjs.com/api/#updating">Updating</a></p><p><a href="http://riotjs.com/api/#unmounting">Unmounting</a></p><p><a href="http://riotjs.com/api/#nested-tags">Nested tags</a></p><p><a href="http://riotjs.com/api/#yielding-nested-html">Yielding nested HTML</a></p><p><a href="http://riotjs.com/api/#events">Events</a></p><p><a href="http://riotjs.com/api/#reserved-words">Reserved words</a></p><p><a href="http://riotjs.com/api/#manual-construction">Manual construction</a></p></div>
+
+<h2 id="mounting">Mounting</h2>
+
+<h3 id="riot-mount-customtagselector-opts"><a name="mount"></a> riot.mount(customTagSelector, [opts])</h3>
+
+<p><code>customTagSelector</code> selects elements from the page and mounts them with a custom tag. The selected elements’ name must match the custom tag name.</p>
+
+<p><code>opts</code> optional object is passed for the tags to consume. This can be anything, ranging from a simple object to a full application API. Or it can be a Flux- store. Really depends on how you want to structure your client-side applications. Read more about <a href="http://riotjs.com/guide/application-design/#modularity">modular Riot applications</a>.</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// selects and mounts all &lt;pricing&gt; tags on the page</span>
+<span class="kd">var</span> <span class="nx">tags</span> <span class="o">=</span> <span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'pricing'</span><span class="p">)</span>
+
+<span class="c1">// mount all custom tags with a class name .customer</span>
+<span class="kd">var</span> <span class="nx">tags</span> <span class="o">=</span> <span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'.customer'</span><span class="p">)</span>
+
+<span class="c1">// mount &lt;account&gt; tag and pass an API object as options</span>
+<span class="kd">var</span> <span class="nx">tags</span> <span class="o">=</span> <span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'account'</span><span class="p">,</span> <span class="nx">api</span><span class="p">)</span>
+</code></pre></div>
+<p>@returns: an array of the mounted <a href="http://riotjs.com/api/#tag-instance">tag instances</a></p>
+
+<h3 id="riot-mount-39-39-opts"><a name="mount-star"></a> riot.mount(’*’, [opts])</h3>
+
+<p>A special Riot specific selector “*” can be used to mount all custom tags on the page:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+</code></pre></div>
+<p>@returns: an array of the mounted <a href="http://riotjs.com/api/#tag-instance">tag instances</a></p>
+
+<h3 id="riot-mount-selector-tagname-opts"><a name="mount-tag"></a> riot.mount(selector, tagName, [opts])</h3>
+
+<p>Where</p>
+
+<ul>
+<li><code>selector</code> selects any DOM nodes from the page to be mounted</li>
+<li><code>tagName</code> specifies the custom tag name to be used</li>
+<li><code>opts</code> optional object is passed for the tags to consume</li>
+</ul>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// mounts custom tag "my-tag" to div#main and pass api as options</span>
+<span class="kd">var</span> <span class="nx">tags</span> <span class="o">=</span> <span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'div#main'</span><span class="p">,</span> <span class="s1">'my-tag'</span><span class="p">,</span> <span class="nx">api</span><span class="p">)</span>
+</code></pre></div>
+<p>@returns: an array of the mounted <a href="http://riotjs.com/api/#tag-instance">tag instances</a></p>
+
+<h3 id="riot-mount-domnode-tagname-opts"><a name="mount-dom"></a> riot.mount(domNode, tagName, [opts])</h3>
+
+<p>Mount a custom tag named tagName on a given domNode passing optional data with opts. For example:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">// mounts "my-tag" to given DOM node
+riot.mount(document.getElementById('slide'), 'users', api)
+</code></pre></div>
+<p>@returns: an array of the mounted <a href="http://riotjs.com/api/#tag-instance">tag instances</a></p>
+
+<h3 id="riot-mountto-domnode-tagname-opts"><a name="mount-to"></a> riot.mountTo(domNode, tagName, [opts])</h3>
+
+<p>This method is deprecated since <em>v2.0.11</em>. This is the same as <code>riot.mount(domNode, tagName, [opts])</code>.</p>
+
+<h2 id="rendering">Rendering</h2>
+
+<h3 id="riot-render-tagname-opts"><a name="render"></a> riot.render(tagName, [opts])</h3>
+
+<p>Rendering a tag to html. This method is only available on <em>server-side</em> (Node/io.js). For example:</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">// render "my-tag" to html
+var mytag = require('my-tag')
+riot.render(mytag, { foo: 'bar' })
+</code></pre></div>
+<p>@returns: tags render as html</p>
+
+<h2 id="tag-instance">Tag instance</h2>
+
+<p>Following properties are set for each tag instance:</p>
+
+<ul>
+<li><code>opts</code> - the options object</li>
+<li><code>parent</code> - the parent tag if any</li>
+<li><code>root</code> - root DOM node</li>
+<li><code>tags</code> - nested custom tags</li>
+</ul>
+
+<p>You can use these references in both the HTML and JavaScript code. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;h3&gt;</span>{ opts.title }<span class="nt">&lt;/h3&gt;</span>
+
+  var title = opts.title
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p>You can freely set any data to the instance (aka “context”) and they are available in the HTML expressions. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;h3&gt;</span>{ title }<span class="nt">&lt;/h3&gt;</span>
+
+  this.title = opts.title
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<h2 id="updating">Updating</h2>
+
+<h3 id="this-update"><a name="tag-update"></a> this.update()</h3>
+
+<p>Updates all the expressions on the current tag instance as well as on all the children. This method is automatically called every time an event handler is called when user interacts with the application.</p>
+
+<p>Other than that riot does not update the UI automatically so you need to call this method manually. This typically happens after some non-UI related event: after <code>setTimeout</code>, AJAX call or on some server event. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+
+  <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">"username"</span> <span class="na">onblur=</span><span class="s">{</span> <span class="na">validate</span> <span class="err">}</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"tooltip"</span> <span class="na">show=</span><span class="s">{</span> <span class="na">error</span> <span class="err">}</span><span class="nt">&gt;</span>{ error }<span class="nt">&lt;/span&gt;</span>
+
+  var self = this
+
+  validate() {
+    $.get('/validate/username/' + this.username.value)
+      .fail(function(error_message) {
+        self.error = error_message
+        self.update()
+      })
+  }
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p>On above example the error message is displayed on the UI after the <code>update()</code> method has been called. We assign <code>this</code> variable to <code>self</code> since inside the AJAX callback <code>this</code> variable points to the response object and not to the tag instance.</p>
+
+<h3 id="this-update-data"><a name="tag-update-data"></a> this.update(data)</h3>
+
+<p>Set values of the current instance and update the expressions. This is same as <code>this.update()</code> but allows you to set context data at the same time. So instead of this:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">self</span><span class="p">.</span><span class="nx">error</span> <span class="o">=</span> <span class="nx">error_message</span>
+<span class="nx">self</span><span class="p">.</span><span class="nx">update</span><span class="p">()</span>
+</code></pre></div>
+<p>you can do this:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">self</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span> <span class="nx">error</span><span class="o">:</span> <span class="nx">error_message</span> <span class="p">})</span>
+</code></pre></div>
+<p>which is shorter and cleaner.</p>
+
+<h3 id="riot-update"><a name="update"></a> riot.update()</h3>
+
+<p>Updates all the mounted tags and their expressions on the page.</p>
+
+<p>@returns: an array of <a href="http://riotjs.com/api/#tag-instance">tag instances</a> that are mounted on the page.</p>
+
+<h2 id="unmounting">Unmounting</h2>
+
+<h3 id="this-unmount-keeptheparent"><a name="tag-unmount"></a> this.unmount(keepTheParent)</h3>
+
+<p>Detaches the tag and it’s children from the page. An “unmount” event is fired.
+If you want to unmount a tag without removing the parent tag you need to pass <code>true</code> to the unmount method</p>
+
+<p>Remove the tag from the DOM:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">mytag</span><span class="p">.</span><span class="nx">unmount</span><span class="p">()</span>
+</code></pre></div>
+<p>Remove the tag children and keep only the parent tag:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">mytag</span><span class="p">.</span><span class="nx">unmount</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="nested-tags">Nested tags</h2>
+
+<p>You have access to nested tag instances via <code>tags</code> variable:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+
+  <span class="nt">&lt;child&gt;&lt;/child&gt;</span>
+
+  // access to child tag
+  var child = this.tags.child
+
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p>If more than one of the same child tag is used, it is accessed as an array <code>this.tags.child[n]</code></p>
+
+<p>You can also use the <code>name</code> attribute to give another name for the nested tag.</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+
+  <span class="nt">&lt;child</span> <span class="na">name=</span><span class="s">"my_nested_tag"</span><span class="nt">&gt;&lt;/child&gt;</span>
+
+  // access to child tag
+  var child = this.tags.my_nested_tag
+
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p>The child tags are initialized after the parent tag so the methods and properties are available on the “mount” event.</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+
+  <span class="nt">&lt;child</span> <span class="na">name=</span><span class="s">"my_nested_tag"</span><span class="nt">&gt;&lt;/child&gt;</span>
+
+  // access to child tag methods
+  this.on('mount', function() {
+    this.tags.my_nested_tag.someMethod()
+  })
+
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<h2 id="yielding-nested-html"><a name="yield"></a> Yielding nested HTML</h2>
+
+<p>The <code>&lt;yield&gt;</code> tag it’s a special riot core feature that allows you to inject and compile the content of any custom tag inside its template in runtime
+This technique allows you to extend your tags templates with html contents rendered eventually from the server</p>
+
+<p>For example using the following riot tag <code>my-post</code></p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-post&gt;</span>
+  <span class="nt">&lt;h1&gt;</span>{ opts.title }<span class="nt">&lt;/h1&gt;</span>
+  <span class="nt">&lt;yield/&gt;</span>
+  this.id = 666
+<span class="nt">&lt;/my-post&gt;</span>
+</code></pre></div>
+<p>anytime you will include the <code>&lt;my-post&gt;</code> tag in your app</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-post</span> <span class="na">title=</span><span class="s">"What a great title"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">"my-content-{ id }"</span><span class="nt">&gt;</span>My beautiful post is just awesome<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/my-post&gt;</span>
+</code></pre></div>
+<p>once mounted <code>riot.mount('my-post')</code> it will be rendered in this way:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-post&gt;</span>
+  <span class="nt">&lt;h1&gt;</span>What a great title<span class="nt">&lt;/h1&gt;</span>
+  <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">"my-content-666"</span><span class="nt">&gt;</span>My beautiful post is just awesome<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/my-post&gt;</span>
+</code></pre></div>
+<h4 id="yield-and-loops">Yield and loops</h4>
+
+<p>The <code>&lt;yield&gt;</code> tag could be used also in a loop or in a child tag but you should be aware that <strong>it will be always parsed and compiled using the child data</strong></p>
+
+<p>The following <code>blog.tag</code> riot component</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;blog&gt;</span>
+  <span class="nt">&lt;h1&gt;</span>{ title }<span class="nt">&lt;/h1&gt;</span>
+  <span class="nt">&lt;my-post</span> <span class="na">each=</span><span class="s">{</span> <span class="na">posts</span> <span class="err">}</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">{</span> <span class="na">this</span><span class="err">.</span><span class="na">parent</span><span class="err">.</span><span class="na">backToHome</span> <span class="err">}</span><span class="nt">&gt;</span>Back to home<span class="nt">&lt;/a&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">onclick=</span><span class="s">{</span> <span class="na">this</span><span class="err">.</span><span class="na">parent</span><span class="err">.</span><span class="na">deleteAllPosts</span> <span class="err">}</span><span class="nt">&gt;</span>Delete all the posts<span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;/my-post&gt;</span>
+
+  this.backToHome = '/homepage'
+  this.title = 'my blog title'
+
+  this.posts = [
+    { title: "post 1", description: 'my post description' },
+    { title: "post 2", description: 'my post description' }
+  ]
+
+  // the bind is needed in this case to keep the parent context
+  // also in the child tags
+  deleteAllPosts() {
+    this.posts = []
+
+    // we need to trigger manually the update function
+    // because this function gets triggered from a child tag
+    // and it does not bubble up automatically
+    this.update()
+  }.bind(this)
+
+<span class="nt">&lt;/blog&gt;</span>
+
+<span class="nt">&lt;my-post&gt;</span>
+  <span class="nt">&lt;h2&gt;</span>{ title }<span class="nt">&lt;/h2&gt;</span>
+  <span class="nt">&lt;p&gt;</span>{ description }<span class="nt">&lt;/p&gt;</span>
+  <span class="nt">&lt;yield/&gt;</span>
+<span class="nt">&lt;/my-post&gt;</span>
+</code></pre></div>
+<p>will be compiled in this way:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;blog&gt;</span>
+  <span class="nt">&lt;h1&gt;</span>my blog title<span class="nt">&lt;/h1&gt;</span>
+  <span class="nt">&lt;my-post&gt;</span>
+    <span class="nt">&lt;h2&gt;</span>post 1<span class="nt">&lt;/h2&gt;</span>
+    <span class="nt">&lt;p&gt;</span>my post description<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"/homepage"</span><span class="nt">&gt;</span>Back to home<span class="nt">&lt;/a&gt;</span>
+    <span class="nt">&lt;div&gt;</span>Delete all the posts<span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;/my-post&gt;</span>
+  <span class="nt">&lt;my-post&gt;</span>
+    <span class="nt">&lt;h2&gt;</span>post 2<span class="nt">&lt;/h2&gt;</span>
+    <span class="nt">&lt;p&gt;</span>my post description<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"/homepage"</span><span class="nt">&gt;</span>Back to home<span class="nt">&lt;/a&gt;</span>
+    <span class="nt">&lt;div&gt;</span>Delete all the posts<span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;/my-post&gt;</span>
+<span class="nt">&lt;/blog&gt;</span>
+</code></pre></div>
+<h2 id="events">Events</h2>
+
+<p>Each tag instance is an <a href="http://riotjs.com/api/#observable">observable</a> so you can use <code>on</code> and <code>one</code> methods to listen to the events that happen on the tag instance. Here’s the list of supported events:</p>
+
+<ul>
+<li>“update” – right before the tag is updated. allows recalculation of context data before the UI expressions are updated.</li>
+<li>“updated” – right after the tag is updated. allows do some work with updated DOM</li>
+<li>“mount” – right after tag is mounted on the page</li>
+<li>“unmount” – after the tag is removed from the page</li>
+</ul>
+
+<p>For example:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// cleanup resources after tag is no longer part of DOM</span>
+<span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'unmount'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  <span class="nx">clearTimeout</span><span class="p">(</span><span class="nx">timer</span><span class="p">)</span>
+<span class="p">})</span>
+</code></pre></div>
+<h2 id="reserved-words">Reserved words</h2>
+
+<p>The above method and property names are reserved words for Riot tags. Don’t use any of following as your instance variable or method name: <code>opts</code>, <code>parent</code>, <code>root</code>, <code>update</code>, <code>unmount</code>, <code>on</code>, <code>off</code>, <code>one</code> and <code>trigger</code>. Variables beginning with an underscore (e.g.: <code>this._item</code>) are reserved for internal use too. Local variables can be freely named. For example:</p>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="o">&lt;</span><span class="nx">my</span><span class="o">-</span><span class="nx">tag</span><span class="o">&gt;</span>
+
+  <span class="c1">// allowed</span>
+  <span class="kd">function</span> <span class="nx">update</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span><span class="err">&nbsp;</span>
+
+  <span class="c1">// not allowed</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">update</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="p">}</span>
+
+  <span class="c1">// not allowed</span>
+  <span class="nx">update</span><span class="p">()</span> <span class="p">{</span>
+
+  <span class="p">}</span>
+
+<span class="o">&lt;</span><span class="err">/my-tag&gt;</span>
+</code></pre></div>
+<h2 id="manual-construction">Manual construction</h2>
+
+<h3 id="riot-tag-tagname-html-css-attrs-constructor"><a name="tag"></a> riot.tag(tagName, html, [css], [attrs], [constructor])</h3>
+
+<p>Creates a new custom tag “manually” without the compiler.</p>
+
+<ul>
+<li><code>tagName</code> the tag name</li>
+<li><code>html</code> is the layout with <a href="http://riotjs.com/guide/#expressions">expressions</a></li>
+<li><code>css</code> is the style for the tag (optional)</li>
+<li><code>attrs</code> string of attributes for the tag (optional).</li>
+<li><code>constructor</code> is the initialization function being called before the tag expressions are calculated and before the tag is mounted</li>
+</ul>
+
+<h4 id="example">Example</h4>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">riot</span><span class="p">.</span><span class="nx">tag</span><span class="p">(</span><span class="s1">'timer'</span><span class="p">,</span>
+  <span class="s1">'&lt;p&gt;Seconds Elapsed: { time }&lt;/p&gt;'</span><span class="p">,</span>
+  <span class="s1">'timer { display: block; border: 2px }'</span><span class="p">,</span>
+  <span class="s1">'class="tic-toc"'</span><span class="p">,</span>
+  <span class="kd">function</span> <span class="p">(</span><span class="nx">opts</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">time</span> <span class="o">=</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">start</span> <span class="o">||</span> <span class="mi">0</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">tick</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">self</span><span class="p">.</span><span class="nx">update</span><span class="p">({</span> <span class="nx">time</span><span class="o">:</span> <span class="o">++</span><span class="nx">self</span><span class="p">.</span><span class="nx">time</span> <span class="p">})</span>
+    <span class="p">}</span>
+
+    <span class="kd">var</span> <span class="nx">timer</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">tick</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'unmount'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+      <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">timer</span><span class="p">)</span>
+    <span class="p">})</span>
+
+  <span class="p">})</span>
+</code></pre></div>
+<p>See <a href="http://jsfiddle.net/gnumanth/h9kuozp5/">timer demo</a> and <a href="http://riotjs.com/api/#tag-instance">riot.tag</a> API docs for more details and <em>limitations</em>.</p>
+
+<p><span class="tag red">Warning</span> by using <code>riot.tag</code> you cannot enjoy the advantages of the compiler and the following features are not supported:</p>
+
+<ol>
+<li>Self-closing tags</li>
+<li>Unquoted expressions. Write <code>value="{ val }"</code> instead of <code>value={ val }</code></li>
+<li>Boolean attributes. Write <code>__checked="{ flag }"</code> instead of <code>checked={ flag }</code></li>
+<li>Shorthand ES6 method signatures</li>
+<li><code>&lt;img src={ src }&gt;</code> must be written as <code>&lt;img riot-src={ src }&gt;</code> in order to avoid illegal server requests</li>
+<li><code>style="color: { color }"</code> must be written as <code>riot-style="color: { color }"</code> so that style attribute expressions work in IE</li>
+<li>Scoped CSS precompilation.</li>
+</ol>
+
+<p>You can take advantage of <code>&lt;template&gt;</code> or <code>&lt;script&gt;</code> tags as follows:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"tmpl"</span> <span class="na">id=</span><span class="s">"my_tmpl"</span><span class="nt">&gt;</span>
+  <span class="o">&lt;</span><span class="nx">h3</span><span class="o">&gt;</span><span class="p">{</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">hello</span> <span class="p">}</span><span class="o">&lt;</span><span class="err">/h3&gt;</span>
+  <span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;</span><span class="nx">And</span> <span class="nx">a</span> <span class="nx">paragraph</span><span class="o">&lt;</span><span class="err">/p&gt;</span>
+<span class="nt">&lt;/script&gt;</span>
+
+<span class="nt">&lt;script&gt;</span>
+<span class="nx">riot</span><span class="p">.</span><span class="nx">tag</span><span class="p">(</span><span class="s1">'tag-name'</span><span class="p">,</span> <span class="nx">my_tmpl</span><span class="p">.</span><span class="nx">innerHTML</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">opts</span><span class="p">)</span> <span class="p">{</span>
+
+<span class="p">})</span>
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div>
+    </main>
+
+  </div>
+
+  <footer id="footer">
+    <div class="wrap">
+      <a href="http://riotjs.com/"><img src="./Riot.js_API_files/riot120x.png"></a>
+      <nav>
+  <a href="http://riotjs.com/compare/">Compare</a>
+  <a href="http://riotjs.com/faq/">FAQ</a>
+  <a href="http://riotjs.com/guide/">Guide</a>
+  <a href="./Riot.js_API_files/Riot.js_API.html" class="current">API</a>
+  <a href="http://riotjs.com/download/">Download</a>
+  <a href="http://riotjs.com/forum/">Forum</a>
+</nav>
+    </div>
+  </footer>
+
+  <script src="./Riot.js_API_files/script.js"></script>
+
+
+
+
+
+</body><object id="0a8b5a38-aa19-bdb4-6829-2884aabbba9b" width="0" height="0" type="application/gas-events-cef"></object></html>

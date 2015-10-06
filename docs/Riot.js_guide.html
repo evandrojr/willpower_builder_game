@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<!-- saved from url=(0024)http://riotjs.com/guide/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>
+    Custom tags · Riot.js 
+  </title>
+
+  
+
+  <!-- favicons -->
+  <link rel="shortcut icon" href="http://riotjs.com/img/favicon-152x152.png">
+  <link rel="icon" type="image/png" sizes="152x152" href="http://riotjs.com/img/favicon-152x152.png">
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="http://riotjs.com/img/favicon-152x152.png">
+
+  <!-- RSS
+  <link rel="alternate" type="application/atom+xml" title="Riot.js" href="/atom.xml">
+  -->
+
+  <!-- style -->
+  <link rel="stylesheet" href="http://riotjs.com/style.css">
+
+<style type="text/css"></style></head>
+
+<body id="" class="">
+
+  <div class="wrap">
+
+    <a id="fork" href="https://github.com/riot/riot">Fork me on GitHub</a>
+
+    <header id="header">
+      <span id="logo">
+        <a href="http://riotjs.com/"><img id="riot-logo" src="./Riot.js_guide_files/riot120x.png"></a>
+        <strong>by</strong>
+        <a href="https://muut.com/"><img id="muut-logo" src="./Riot.js_guide_files/muut.png"></a>
+      </span>
+
+      <nav id="nav">
+  <a href="http://riotjs.com/compare/">Compare</a>
+  <a href="http://riotjs.com/faq/">FAQ</a>
+  <a href="./Riot.js_guide_files/Riot.js_guide.html" class="current">Guide</a>
+  <a href="http://riotjs.com/api/">API</a>
+  <a href="http://riotjs.com/download/">Download</a>
+  <a href="http://riotjs.com/forum/">Forum</a>
+</nav>
+
+    </header>
+
+    <main id="main">
+      <div id="tabs">
+  <a href="./Riot.js_guide_files/Riot.js_guide.html" class="current">Custom tags</a>
+  <a href="http://riotjs.com/guide/compiler/">Compiler</a>
+  <a href="http://riotjs.com/guide/application-design/">App design</a>
+  <a href="http://riotjs.com/guide/v1.0/">v1.0</a>
+</div>
+
+<h1>Custom tags</h1>
+
+<div id="toc"><p><a href="http://riotjs.com/guide/#example">Example</a></p><p><a href="http://riotjs.com/guide/#tag-syntax">Tag syntax</a></p><p><a href="http://riotjs.com/guide/#pre-processor">Pre-processor</a></p><p><a href="http://riotjs.com/guide/#tag-styling">Tag styling</a></p><p><a href="http://riotjs.com/guide/#mounting">Mounting</a></p><p><a href="http://riotjs.com/guide/#expressions">Expressions</a></p><p><a href="http://riotjs.com/guide/#nested-tags">Nested tags</a></p><p><a href="http://riotjs.com/guide/#named-elements">Named elements</a></p><p><a href="http://riotjs.com/guide/#event-handlers">Event handlers</a></p><p><a href="http://riotjs.com/guide/#conditionals">Conditionals</a></p><p><a href="http://riotjs.com/guide/#loops">Loops</a></p><p><a href="http://riotjs.com/guide/#html-elements-as-tags">HTML elements as tags</a></p><p><a href="http://riotjs.com/guide/#server-side-rendering">Server-side rendering</a></p></div>
+
+<h2 id="example">Example</h2>
+
+<p>Riot custom tags are the building blocks for user interfaces. They make the “view” part of the application. Let’s start with an extended TODO example highlighting various features of Riot:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;todo&gt;</span>
+
+  <span class="nt">&lt;h3&gt;</span>{ opts.title }<span class="nt">&lt;/h3&gt;</span>
+
+  <span class="nt">&lt;ul&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">each=</span><span class="s">{</span> <span class="na">items</span> <span class="err">}</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;label</span> <span class="na">class=</span><span class="s">{</span> <span class="na">completed:</span> <span class="na">done</span> <span class="err">}</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"checkbox"</span> <span class="na">checked=</span><span class="s">{</span> <span class="na">done</span> <span class="err">}</span> <span class="na">onclick=</span><span class="s">{</span> <span class="na">parent</span><span class="err">.</span><span class="na">toggle</span> <span class="err">}</span><span class="nt">&gt;</span> { title }
+      <span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;/li&gt;</span>
+  <span class="nt">&lt;/ul&gt;</span>
+
+  <span class="nt">&lt;form</span> <span class="na">onsubmit=</span><span class="s">{</span> <span class="na">add</span> <span class="err">}</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">"input"</span> <span class="na">onkeyup=</span><span class="s">{</span> <span class="na">edit</span> <span class="err">}</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">disabled=</span><span class="s">{</span> <span class="err">!</span><span class="na">text</span> <span class="err">}</span><span class="nt">&gt;</span>Add #{ items.length + 1 }<span class="nt">&lt;/button&gt;</span>
+  <span class="nt">&lt;/form&gt;</span>
+
+  <span class="nt">&lt;script&gt;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">disabled</span> <span class="o">=</span> <span class="kc">true</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">items</span> <span class="o">=</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">items</span>
+
+    <span class="nx">edit</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">text</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span>
+    <span class="p">}</span>
+
+    <span class="nx">add</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">text</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">items</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span> <span class="nx">title</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">text</span> <span class="p">})</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">text</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">input</span><span class="p">.</span><span class="nx">value</span> <span class="o">=</span> <span class="s1">''</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="nx">toggle</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">item</span> <span class="o">=</span> <span class="nx">e</span><span class="p">.</span><span class="nx">item</span>
+      <span class="nx">item</span><span class="p">.</span><span class="nx">done</span> <span class="o">=</span> <span class="o">!</span><span class="nx">item</span><span class="p">.</span><span class="nx">done</span>
+      <span class="k">return</span> <span class="kc">true</span>
+    <span class="p">}</span>
+  <span class="nt">&lt;/script&gt;</span>
+
+<span class="nt">&lt;/todo&gt;</span>
+</code></pre></div>
+<p>Custom tags are <a href="http://riotjs.com/guide/compiler/">compiled</a> to JavaScript.</p>
+
+<p>See the <a href="http://muut.github.io/riotjs/demo/">live demo</a>, browse the <a href="https://github.com/riot/riot/tree/gh-pages/demo">sources</a>, or download the <a href="https://github.com/riot/riot/archive/gh-pages.zip">zip</a>.</p>
+
+<h2 id="tag-syntax">Tag syntax</h2>
+
+<p>A Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the basic rules:</p>
+
+<ul>
+<li>HTML is defined first and the logic is enclosed inside an optional <code>&lt;script&gt;</code> tag. <em>note: the script tag can not be used when including tag definitions in the document body, only in external tag files</em></li>
+<li>Without the <code>&lt;script&gt;</code> tag the JavaScript starts where the last HTML tag ends.</li>
+<li>Custom tags can be empty, HTML only or JavaScript only</li>
+<li>Quotes are optional: <code>&lt;foo bar={ baz }&gt;</code> becomes <code>&lt;foo bar="{ baz }"&gt;</code>.</li>
+<li>ES6 method syntax is supported: <code>methodName()</code> becomes <code>this.methodName = function()</code> and <code>this</code> variable always points to the current tag instance.</li>
+<li>A shorthand syntax for class names is available: <code>class={ completed: done }</code> renders to <code>class="completed"</code>when the value of <code>done</code> is a true value.</li>
+<li>Boolean attributes (checked, selected etc..) are ignored when the expression value is falsy: <code>&lt;input checked={ undefined }&gt;</code> becomes <code>&lt;input&gt;</code>.</li>
+<li>All attribute names <em>must be lowercase</em>. This is due to browser specification.</li>
+<li>Self-closing tags are supported: <code>&lt;div/&gt;</code> equals <code>&lt;div&gt;&lt;/div&gt;</code>. Well known “open tags” such as <code>&lt;br&gt;</code>, <code>&lt;hr&gt;</code>, <code>&lt;img&gt;</code> or <code>&lt;input&gt;</code> are never closed after the compilation.</li>
+<li>Custom tags always need to be closed (normally or self-closed).</li>
+<li>Standard HTML tags (<code>label</code>, <code>table</code>, <code>a</code> etc..) can also be customized, but not necessarily a wise thing to do.</li>
+</ul>
+
+<p>Tag definition in tag files always starts on the beginning of the line:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- works --&gt;</span>
+<span class="nt">&lt;my-tag&gt;</span>
+
+<span class="nt">&lt;/my-tag&gt;</span>
+
+<span class="c">&lt;!-- also works --&gt;</span>
+<span class="nt">&lt;my-tag&gt;&lt;/my-tag&gt;</span>
+
+  <span class="c">&lt;!-- this fails, because of indentation --&gt;</span>
+  <span class="nt">&lt;my-tag&gt;</span>
+
+  <span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p>Inline tag definitions(in document body) must be properly indented, with all custom tags equally indented at the lowest indent level, mixing of tabs and spaces is discouraged.</p>
+
+<h3 id="no-script-tag">No script tag</h3>
+
+<p>You can leave out the <code>&lt;script&gt;</code> tag:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;todo&gt;</span>
+
+  <span class="c">&lt;!-- layout --&gt;</span>
+  <span class="nt">&lt;h3&gt;</span>{ opts.title }<span class="nt">&lt;/h3&gt;</span>
+
+  // logic comes here
+  this.items = [1, 2, 3]
+
+<span class="nt">&lt;/todo&gt;</span>
+</code></pre></div>
+<p>In which case the logic starts after the last HTML tag. This “open syntax” is more commonly used on the examples on this website.</p>
+
+<h2 id="pre-processor">Pre-processor</h2>
+
+<p>You can specify a pre-processor with <code>type</code> attribute. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"coffee"</span><span class="nt">&gt;</span>
+    <span class="err">#</span> <span class="nx">your</span> <span class="nx">coffeescript</span> <span class="nx">logic</span> <span class="nx">goes</span> <span class="nx">here</span>
+  <span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p>Currently available options are “coffee”, “typescript”, “es6” and “none”. You can also prefix the language with “text/”, such as “text/coffee”.</p>
+
+<p>See <a href="http://riotjs.com/guide/compiler/#pre-processors">pre processors</a> for more details.</p>
+
+<h2 id="tag-styling">Tag styling</h2>
+
+<p>You can put a <code>style</code> tag inside. Riot.js automatically takes it out and injects it into <code>&lt;head&gt;</code>.</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;todo&gt;</span>
+
+  <span class="c">&lt;!-- layout --&gt;</span>
+  <span class="nt">&lt;h3&gt;</span>{ opts.title }<span class="nt">&lt;/h3&gt;</span>
+
+  <span class="nt">&lt;style&gt;</span>
+    <span class="nt">todo</span> <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">block</span> <span class="p">}</span>
+    <span class="nt">todo</span> <span class="nt">h3</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">120%</span> <span class="p">}</span>
+    <span class="c">/** other tag specific styles **/</span>
+  <span class="nt">&lt;/style&gt;</span>
+
+<span class="nt">&lt;/todo&gt;</span>
+</code></pre></div>
+<h3 id="scoped-css">Scoped CSS</h3>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/:scope">Scoped CSS</a> is also available. The example below is equivalent to the first one.</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;todo&gt;</span>
+
+  <span class="c">&lt;!-- layout --&gt;</span>
+  <span class="nt">&lt;h3&gt;</span>{ opts.title }<span class="nt">&lt;/h3&gt;</span>
+
+  <span class="nt">&lt;style </span><span class="na">scoped</span><span class="nt">&gt;</span>
+    <span class="nd">:scope</span> <span class="p">{</span> <span class="k">display</span><span class="o">:</span> <span class="k">block</span> <span class="p">}</span>
+    <span class="nt">h3</span> <span class="p">{</span> <span class="k">font-size</span><span class="o">:</span> <span class="m">120%</span> <span class="p">}</span>
+    <span class="c">/** other tag specific styles **/</span>
+  <span class="nt">&lt;/style&gt;</span>
+
+<span class="nt">&lt;/todo&gt;</span>
+</code></pre></div>
+<p>This happens once, no matter how many times the tag is initialized.</p>
+
+<p>To make it easier to override the CSS you can specify where in the <code>&lt;head&gt;</code> Riot should inject tag styles:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"riot"</span><span class="nt">&gt;&lt;/style&gt;</span>
+</code></pre></div>
+<p>Example use case would be to insert tag styles from a component library after normalize.css but before your website’s theme CSS allowing you to override the library’s default styling.</p>
+
+<h2 id="mounting">Mounting</h2>
+
+<p>Once a tag is created you can mount it on the page as follows:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;body&gt;</span>
+
+  <span class="c">&lt;!-- place the custom tag anywhere inside the body --&gt;</span>
+  <span class="nt">&lt;todo&gt;&lt;/todo&gt;</span>
+
+  <span class="c">&lt;!-- include riot.js --&gt;</span>
+  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"riot.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+
+  <span class="c">&lt;!-- include the tag --&gt;</span>
+  <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"todo.js"</span> <span class="na">type=</span><span class="s">"riot/tag"</span><span class="nt">&gt;&lt;/script&gt;</span>
+
+  <span class="c">&lt;!-- mount the tag --&gt;</span>
+  <span class="nt">&lt;script&gt;</span><span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'todo'</span><span class="p">)</span><span class="nt">&lt;/script&gt;</span>
+
+<span class="nt">&lt;/body&gt;</span>
+</code></pre></div>
+<p>Custom tags inside the <code>body</code> of the page needs to be closed normally: <code>&lt;todo&gt;&lt;/todo&gt;</code> and self-closing: <code>&lt;todo/&gt;</code> is not supported.</p>
+
+<p>Some example uses of the mount method:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// mount all custom tags on the page</span>
+<span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'*'</span><span class="p">)</span>
+
+<span class="c1">// mount an element with a specific id</span>
+<span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'#my-element'</span><span class="p">)</span>
+
+<span class="c1">// mount selected elements</span>
+<span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'todo, forum, comments'</span><span class="p">)</span>
+</code></pre></div>
+<p>A document can contain multiple instances of the same tag.</p>
+
+<h3 id="accessing-dom-elements">Accessing DOM elements</h3>
+
+<p>Riot gives you access to elements that have <code>name</code> attributes directly under the <code>this</code> keyword, and plenty of shorthand property-methods like the <code>if="{...}"</code> attribute, but occasionally you need to reference and touch pieces of HTML which don’t really fit inside those prebaked functions.</p>
+
+<h3 id="how-to-use-jquery-zepto-queryselector-etc">How to use jQuery, Zepto, querySelector, etc…</h3>
+
+<p>If you need to access the DOM inside Riot, you’ll want to take a look at the <a href="http://riotjs.com/guide/#tag-lifecycle">Tag Lifecycle</a> and notice that the DOM elements aren’t instantiated until the <code>update()</code> event first fires, meaning any attempt to select an element before then will fail.</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;example-tag&gt;</span>
+  <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">"findMe"</span><span class="nt">&gt;</span>Do I even Exist?<span class="nt">&lt;/p&gt;</span>
+
+  <span class="nt">&lt;script&gt;</span>
+  <span class="kd">var</span> <span class="nx">test1</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'findMe'</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'test1'</span><span class="p">,</span> <span class="nx">test1</span><span class="p">)</span>  <span class="c1">// Fails</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'update'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="kd">var</span> <span class="nx">test2</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'findMe'</span><span class="p">)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'test2'</span><span class="p">,</span> <span class="nx">test2</span><span class="p">)</span> <span class="c1">// Succeeds</span>
+  <span class="p">})</span>
+  <span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/example-tag&gt;</span>
+</code></pre></div>
+<p>You probably don’t want to run whatever you’re attempting to retrieve on every update. Instead you’ll most likely want to run on the <code>mount</code> event.</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;example-tag&gt;</span>
+  <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">"findMe"</span><span class="nt">&gt;</span>Do I even Exist?<span class="nt">&lt;/p&gt;</span>
+
+  <span class="nt">&lt;script&gt;</span>
+  <span class="kd">var</span> <span class="nx">test1</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'findMe'</span><span class="p">)</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'test1'</span><span class="p">,</span> <span class="nx">test1</span><span class="p">)</span>  <span class="c1">// Fails</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'update'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="kd">var</span> <span class="nx">test2</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'findMe'</span><span class="p">)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'test2'</span><span class="p">,</span> <span class="nx">test2</span><span class="p">)</span> <span class="c1">// Succeeds, fires on every update</span>
+  <span class="p">})</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'mount'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="kd">var</span> <span class="nx">test3</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'findMe'</span><span class="p">)</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'test3'</span><span class="p">,</span> <span class="nx">test3</span><span class="p">)</span> <span class="c1">// Succeeds, fires once (per mount)</span>
+  <span class="p">})</span>
+  <span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/example-tag&gt;</span>
+</code></pre></div>
+<h3 id="contexted-dom-query">Contexted DOM query</h3>
+
+<p>Now that we know how to get DOM elements by waiting for the <code>update</code> or <code>mount</code> events, we can make this useful by also adding a context to our element queries to the <code>root element</code> (the riot tag we’re creating).</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;example-tag&gt;</span>
+  <span class="nt">&lt;p</span> <span class="na">id=</span><span class="s">"findMe"</span><span class="nt">&gt;</span>Do I even Exist?<span class="nt">&lt;/p&gt;</span>
+  <span class="nt">&lt;p&gt;</span>Is this real life?<span class="nt">&lt;/p&gt;</span>
+  <span class="nt">&lt;p&gt;</span>Or just fantasy?<span class="nt">&lt;/p&gt;</span>
+
+  <span class="nt">&lt;script&gt;</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'mount'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="c1">// Contexted jQuery</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">'p'</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">root</span><span class="p">)</span>
+
+    <span class="c1">// Contexted Query Selector</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">root</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">'p'</span><span class="p">)</span>
+  <span class="p">})</span>
+  <span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/example-tag&gt;</span>
+</code></pre></div>
+<h3 id="options">Options</h3>
+
+<p>You can pass options for tags in the second argument</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;script&gt;</span>
+<span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'todo'</span><span class="p">,</span> <span class="p">{</span> <span class="nx">title</span><span class="o">:</span> <span class="s1">'My TODO app'</span><span class="p">,</span> <span class="nx">items</span><span class="o">:</span> <span class="p">[</span> <span class="p">...</span> <span class="p">]</span> <span class="p">})</span>
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div>
+<p>The passed data can be anything, ranging from a simple object to a full application API. Or it can be a Flux store. Depends on the designed architecture.</p>
+
+<p>Inside the tag the options can be referenced with the <code>opts</code> variable as follows:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+
+  <span class="c">&lt;!-- Options in HTML --&gt;</span>
+  <span class="nt">&lt;h3&gt;</span>{ opts.title }<span class="nt">&lt;/h3&gt;</span>
+
+  // Options in JavaScript
+  var title = opts.title
+
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<h3 id="mixins">Mixins</h3>
+
+<p>Mixins provide an easy way to share functionality across tags. When a tag is compiled by riot, any defined mixins are added and available to use in the tag.</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">OptsMixin</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'updated'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Updated!'</span><span class="p">)</span> <span class="p">})</span>
+  <span class="p">},</span>
+
+  <span class="nx">getOpts</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">opts</span>
+  <span class="p">},</span>
+
+  <span class="nx">setOpts</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">opts</span><span class="p">,</span> <span class="nx">update</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">opts</span> <span class="o">=</span> <span class="nx">opts</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">update</span><span class="p">)</span> <span class="k">this</span><span class="p">.</span><span class="nx">update</span><span class="p">()</span>
+    <span class="k">return</span> <span class="k">this</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="o">&lt;</span><span class="nx">my</span><span class="o">-</span><span class="nx">tag</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="p">{</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">title</span> <span class="p">}</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">mixin</span><span class="p">(</span><span class="nx">OptsMixin</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="err">/my-tag&gt;</span>
+</code></pre></div>
+<p>In this example you are giving any instance of the <code>my-tag</code> Tag the <code>OptsMixin</code> which provides <code>getOpts</code> and <code>setOpts</code> methods. <code>init</code> method is special one which can initialize the mixin when it’s loaded to the tag. (<code>init</code> method is not accessible from the tag its mixed in)</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">my_tag_instance</span> <span class="o">=</span> <span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'my-tag'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">my_tag_instance</span><span class="p">.</span><span class="nx">getOpts</span><span class="p">())</span> <span class="c1">// will log out any opts that the tag has</span>
+</code></pre></div>
+<p>Tags will accept any object – <code>{'key': 'val'}</code> <code>var mix = new function(...)</code> – and will error out when any other type is passed to it.</p>
+
+<p>The <code>my-tag</code> definition now has a <code>getId</code> method added to it along with anything defined in the <code>OptsMixin</code> except for the <code>init</code> function.</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">function</span> <span class="nx">IdMixin</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">getId</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">_id</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">var</span> <span class="nx">id_mixin_instance</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">IdMixin</span><span class="p">()</span>
+
+<span class="o">&lt;</span><span class="nx">my</span><span class="o">-</span><span class="nx">tag</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="p">{</span> <span class="nx">opts</span><span class="p">.</span><span class="nx">title</span> <span class="p">}</span><span class="o">&lt;</span><span class="err">/h1&gt;</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">mixin</span><span class="p">(</span><span class="nx">OptsMixin</span><span class="p">,</span> <span class="nx">id_mixin_instance</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="err">/my-tag&gt;</span>
+</code></pre></div>
+<p>By being defined on the tag level, mixins not only extend the functionality of your tag, but also allows for a repeatable interface. Every time a tag is mounted, even sub-tags, the instance will have the mixed-in code.</p>
+
+<h3 id="sharing-mixin">Sharing mixin</h3>
+
+<p>To share the mixins over files or projects, <code>riot.mixin</code> API is provided. You can register your mixin globally like this:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">riot</span><span class="p">.</span><span class="nx">mixin</span><span class="p">(</span><span class="s1">'mixinName'</span><span class="p">,</span> <span class="nx">mixinObject</span><span class="p">)</span>
+</code></pre></div>
+<p>To load the mixin to the tag, use <code>mixin()</code> method with the key.</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;h1&gt;</span>{ opts.title }<span class="nt">&lt;/h1&gt;</span>
+
+  this.mixin('mixinName')
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<h3 id="tag-lifecycle">Tag lifecycle</h3>
+
+<p>A tag is created in following sequence:</p>
+
+<ol>
+<li>Tag is constructed</li>
+<li>Tag’s JavaScript logic is executed</li>
+<li>HTML expressions are calculated and “update” event is fired</li>
+<li>Tag is mounted on the page and “mount” event is fired</li>
+</ol>
+
+<p>After the tag is mounted the expressions are updated as follows:</p>
+
+<ol>
+<li>Automatically after an event handler is called. (unless you set e.preventUpdate to true in your event handler) For example the <code>toggle</code> method in the above example.</li>
+<li>When <code>this.update()</code> is called on the current tag instance</li>
+<li>When <code>this.update()</code> is called on a parent tag, or any parent upwards. Updates flow uni-directionally from parent to child.</li>
+<li>When <code>riot.update()</code> is called, which globally updates all expressions on the page.</li>
+</ol>
+
+<p>The “update” event is fired every time the tag is updated.</p>
+
+<p>Since the values are calculated before mounting there are no surprise issues such as failed <code>&lt;img src={ src }&gt;</code> calls.</p>
+
+<h3 id="listening-to-lifecycle-events">Listening to lifecycle events</h3>
+
+<p>You can listen to various lifecyle events inside the tag as follows:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="o">&lt;</span><span class="nx">todo</span><span class="o">&gt;</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'mount'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// right after tag is mounted on the page</span>
+  <span class="p">})</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'update'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// allows recalculation of context data before the update</span>
+  <span class="p">})</span>
+
+  <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'unmount'</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// when the tag is removed from the page</span>
+  <span class="p">})</span>
+
+  <span class="c1">// curious about all events ?</span>
+  <span class="k">this</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'mount update unmount'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">eventName</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="nx">eventName</span><span class="p">)</span>
+  <span class="p">})</span>
+
+<span class="o">&lt;</span><span class="err">/todo&gt;</span>
+</code></pre></div>
+<p>You can have multiple event listeners for the same event. See <a href="http://riotjs.com/api/observable/">observable</a> for more details about events.</p>
+
+<h2 id="expressions">Expressions</h2>
+
+<p>HTML can be mixed with expressions that are enclosed in curly braces:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">{</span> <span class="cm">/* my_expression goes here */</span> <span class="p">}</span>
+</code></pre></div>
+<p>Expressions can set attributes or nested text nodes:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;h3</span> <span class="na">id=</span><span class="s">{</span> <span class="err">/*</span> <span class="na">attribute_expression</span> <span class="err">*/</span> <span class="err">}</span><span class="nt">&gt;</span>
+  { /* nested_expression */ }
+<span class="nt">&lt;/h3&gt;</span>
+</code></pre></div>
+<p>Expressions are 100% JavaScript. A few examples:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="p">{</span> <span class="nx">title</span> <span class="o">||</span> <span class="s1">'Untitled'</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">results</span> <span class="o">?</span> <span class="s1">'ready'</span> <span class="o">:</span> <span class="s1">'loading'</span> <span class="p">}</span>
+<span class="p">{</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">()</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nx">message</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">140</span> <span class="o">&amp;&amp;</span> <span class="s1">'Message is too long'</span> <span class="p">}</span>
+<span class="p">{</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">(</span><span class="nx">rating</span><span class="p">)</span> <span class="p">}</span>
+</code></pre></div>
+<p>The goal is to keep the expressions small so your HTML stays as clean as possible. If your expression grows in complexity consider moving some of logic to the “update” event. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+
+  <span class="c">&lt;!-- the `val` is calculated below .. --&gt;</span>
+  <span class="nt">&lt;p&gt;</span>{ val }<span class="nt">&lt;/p&gt;</span>
+
+  // ..on every update
+  this.on('update', function() {
+    this.val = some / complex * expression ^ here
+  })
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<h3 id="boolean-attributes">Boolean attributes</h3>
+
+<p>Boolean attributes (checked, selected etc..) are ignored when the expression value is falsy:</p>
+
+<p><code>&lt;input checked={ null }&gt;</code> becomes <code>&lt;input&gt;</code>.</p>
+
+<p>W3C states that a boolean property is true if the attribute is present at all — even if the value is empty of <code>false</code>.</p>
+
+<p>The following expression does not work:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"checkbox"</span> <span class="err">{</span> <span class="na">true</span> <span class="err">?</span> <span class="err">'</span><span class="na">checked</span><span class="err">'</span> <span class="na">:</span> <span class="err">''}</span><span class="nt">&gt;</span>
+</code></pre></div>
+<p>since only attribute and nested text expressions are valid. Riot detects 44 different boolean attributes.</p>
+
+<h3 id="class-shorthand">Class shorthand</h3>
+
+<p>Riot has a special syntax for CSS class names. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;p</span> <span class="na">class=</span><span class="s">{</span> <span class="na">foo:</span> <span class="na">true</span><span class="err">,</span> <span class="na">bar:</span> <span class="na">0</span><span class="err">,</span> <span class="na">baz:</span> <span class="na">new</span> <span class="na">Date</span><span class="err">(),</span> <span class="na">zorro:</span> <span class="err">'</span><span class="na">a</span> <span class="na">value</span><span class="err">'</span> <span class="err">}</span><span class="nt">&gt;&lt;/p&gt;</span>
+</code></pre></div>
+<p>evaluates to “foo baz zorro”. Property names whose value is truthful are appended to the list of class names. Of course you can use this notation in other places than class names if you find a suitable use case.</p>
+
+<h3 id="printing-brackets">Printing brackets</h3>
+
+<p>You can output an expression without evaluation by escaping the opening brace:</p>
+
+<p><code>\\{ this is not evaluated \\}</code> outputs <code>{ this is not evaluated }</code></p>
+
+<h3 id="customizing-curly-braces">Customizing curly braces</h3>
+
+<p>You are free to customize the braces to your liking. For example:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">riot</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">brackets</span> <span class="o">=</span> <span class="s1">'${ }'</span>
+<span class="nx">riot</span><span class="p">.</span><span class="nx">settings</span><span class="p">.</span><span class="nx">brackets</span> <span class="o">=</span> <span class="s1">'\{\{ }}'</span>
+</code></pre></div>
+<p>The start and end is separated with a space character.</p>
+
+<p>When using <a href="http://riotjs.com/guide/compiler/#pre-compilation">pre-compiler</a> you’ll have to set <code>brackets</code> option there as well.</p>
+
+<h3 id="etc">Etc</h3>
+
+<p>Expressions inside <code>style</code> tags are ignored.</p>
+
+<h3 id="render-unescaped-html">Render unescaped HTML</h3>
+
+<p>Riot expressions can only render text values without HTML formatting. However you can make a custom tag to do the job. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;raw&gt;</span>
+  <span class="nt">&lt;span&gt;&lt;/span&gt;</span>
+
+  this.root.innerHTML = opts.content
+<span class="nt">&lt;/raw&gt;</span>
+</code></pre></div>
+<p>After the tag is defined you can use it inside other tags. For example</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;p&gt;</span>Here is some raw content: <span class="nt">&lt;raw</span> <span class="na">content=</span><span class="s">"{ html }"</span><span class="nt">/&gt;</span> <span class="nt">&lt;/p&gt;</span>
+
+  this.html = 'Hello, <span class="nt">&lt;strong&gt;</span>world!<span class="nt">&lt;/strong&gt;</span>'
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p><a href="http://jsfiddle.net/23g73yvx/">demo on jsfiddle</a></p>
+
+<p><span class="tag red">warning</span> this could expose the user to XSS attacks so make sure you never load data from an untrusted source.</p>
+
+<h2 id="nested-tags">Nested tags</h2>
+
+<p>Let’s define a parent tag <code>&lt;account&gt;</code> and with a nested tag <code>&lt;subscription&gt;</code>:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;account&gt;</span>
+  <span class="nt">&lt;subscription</span>  <span class="na">plan=</span><span class="s">{</span> <span class="na">opts</span><span class="err">.</span><span class="na">plan</span> <span class="err">}</span> <span class="na">show_details=</span><span class="s">"true"</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/account&gt;</span>
+
+
+<span class="nt">&lt;subscription&gt;</span>
+  <span class="nt">&lt;h3&gt;</span>{ opts.plan.name }<span class="nt">&lt;/h3&gt;</span>
+
+  // Get JS handle to options
+  var plan = opts.plan,
+      show_details = opts.show_details
+
+  // access to the parent tag
+  var parent = this.parent
+
+<span class="nt">&lt;/subscription&gt;</span>
+</code></pre></div>
+<p><span class="tag red">important</span> Note how we named the <code>show_details</code> attribute using an underscore instead of camel case, which due to browser specification would have been automatically converted to lowercase.</p>
+
+<p>Then we mount the <code>account</code> tag to the page with a <code>plan</code> configuration option:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;body&gt;</span>
+  <span class="nt">&lt;account&gt;&lt;/account&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+
+<span class="nt">&lt;script&gt;</span>
+<span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'account'</span><span class="p">,</span> <span class="p">{</span> <span class="nx">plan</span><span class="o">:</span> <span class="p">{</span> <span class="nx">name</span><span class="o">:</span> <span class="s1">'small'</span><span class="p">,</span> <span class="nx">term</span><span class="o">:</span> <span class="s1">'monthly'</span> <span class="p">}</span> <span class="p">})</span>
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div>
+<p>Parent tag options are passed with the <code>riot.mount</code> method and child tag options are passed on the tag attribute.</p>
+
+<p><span class="tag red">important</span> Nested tags are always declared inside a parent custom tag. They are not initialized if they are defined on the page.</p>
+
+<h3 id="nested-html">Nested HTML</h3>
+
+<p>“HTML transclusion” is a way to process the inner HTML on the page. This is achieved with a build-in <code>&lt;yield&gt;</code> tag. Example:</p>
+
+<h3 id="tag-definition">Tag definition</h3>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;p&gt;</span>Hello <span class="nt">&lt;yield/&gt;&lt;/p&gt;</span>
+  this.text = 'world'
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<h3 id="usage">Usage</h3>
+
+<p>Custom tag is placed on a page with nested HTML</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;b&gt;</span>{ text }<span class="nt">&lt;/b&gt;</span>
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<h3 id="result">Result</h3>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;p&gt;</span>Hello <span class="nt">&lt;b&gt;</span>world<span class="nt">&lt;/b&gt;&lt;p&gt;</span>
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p>See <a href="http://riotjs.com/api/#yield">API docs</a> for <code>yield</code>.</p>
+
+<h2 id="named-elements">Named elements</h2>
+
+<p>Elements with <code>name</code> or <code>id</code> attribute are automatically bound to the context so you’ll have an easy access to them with JavaScript:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;login&gt;</span>
+  <span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">"login"</span> <span class="na">onsubmit=</span><span class="s">{</span> <span class="na">submit</span> <span class="err">}</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">"username"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">"password"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;button</span> <span class="na">name=</span><span class="s">"submit"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;/form&gt;</span>
+
+  // grab above HTML elements
+  var form = this.login,
+    username = this.username.value,
+    password = this.password.value,
+    button = this.submit
+
+<span class="nt">&lt;/login&gt;</span>
+</code></pre></div>
+<p>Of course these named elements can be referred to in HTML as well: <code>&lt;div&gt;{ username.value }&lt;/div&gt;</code></p>
+
+<h2 id="event-handlers">Event handlers</h2>
+
+<p>A function that deals with DOM events is called an “event handler”. Event handlers are defined as follows:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;login&gt;</span>
+  <span class="nt">&lt;form</span> <span class="na">onsubmit=</span><span class="s">{</span> <span class="na">submit</span> <span class="err">}</span><span class="nt">&gt;</span>
+
+  <span class="nt">&lt;/form&gt;</span>
+
+  // this method is called when above form is submitted
+  submit(e) {
+
+  }
+<span class="nt">&lt;/login&gt;</span>
+</code></pre></div>
+<p>Attributes beginning with “on” (<code>onclick</code>, <code>onsubmit</code>, <code>oninput</code> etc…) accept a function value which is called when the event occurs. This function can also be defined dynamically with an expression. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;form</span> <span class="na">onsubmit=</span><span class="s">{</span> <span class="na">condition</span> <span class="err">?</span> <span class="na">method_a</span> <span class="na">:</span> <span class="na">method_b</span> <span class="err">}</span><span class="nt">&gt;</span>
+</code></pre></div>
+<p>In the function <code>this</code> refers to the current tag instance. After the handler is called <code>this.update()</code> is automatically called reflecting all the possible changes to the UI.</p>
+
+<p>The default event handler behavior is <em>automatically cancelled</em> unless the element is a checkbox or radio button. This means that <code>e.preventDefault()</code> is already called for you, because this is what you usually want (or forget to do). You can let the browser do the default thing by returning <code>true</code> on the handler.</p>
+
+<p>For example, this submit handler will actually submit the form to the server:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">submit</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="event-object">Event object</h3>
+
+<p>The event handler receives the standard event object as the first argument. The following properties are normalized to work across browsers:</p>
+
+<ul>
+<li><code>e.currentTarget</code> points to the element where the event handler is specified.</li>
+<li><code>e.target</code> is the originating element. This is not necessarily the same as <code>currentTarget</code>.</li>
+<li><code>e.which</code> is the key code in a keyboard event (<code>keypress</code>, <code>keyup</code>, etc…).</li>
+<li><code>e.item</code> is the current element in a loop. See <a href="http://riotjs.com/guide/#loops">loops</a> for more details.</li>
+</ul>
+
+<h2 id="conditionals">Conditionals</h2>
+
+<p>Conditionals let you show / hide elements based on a condition. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;div</span> <span class="na">if=</span><span class="s">{</span> <span class="na">is_premium</span> <span class="err">}</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;p&gt;</span>This is for premium users only<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div>
+<p>Again, the expression can be just a simple property or a full JavaScript expression. The following special attributes are available:</p>
+
+<ul>
+<li><code>show</code> – show the element using <code>style="display: ''"</code> when the value is true</li>
+<li><code>hide</code> – hide the element using <code>style="display: none"</code> when the value is true</li>
+<li><code>if</code> – add (true value) or remove (false value) the element from the document</li>
+</ul>
+
+<p>The equality operator is <code>==</code> and not <code>===</code>. For example: <code>'a string' == true</code>.</p>
+
+<h2 id="loops">Loops</h2>
+
+<p>Loops are implemented with <code>each</code> attribute as follows:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;todo&gt;</span>
+  <span class="nt">&lt;ul&gt;</span>
+    <span class="nt">&lt;li</span> <span class="na">each=</span><span class="s">{</span> <span class="na">items</span> <span class="err">}</span> <span class="na">class=</span><span class="s">{</span> <span class="na">completed:</span> <span class="na">done</span> <span class="err">}</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"checkbox"</span> <span class="na">checked=</span><span class="s">{</span> <span class="na">done</span> <span class="err">}</span><span class="nt">&gt;</span> { title }
+    <span class="nt">&lt;/li&gt;</span>
+  <span class="nt">&lt;/ul&gt;</span>
+
+  this.items = [
+    { title: 'First item', done: true },
+    { title: 'Second item' },
+    { title: 'Third item' }
+  ]
+<span class="nt">&lt;/todo&gt;</span>
+</code></pre></div>
+<p>The element with the <code>each</code> attribute will be repeated for all items in the array. New elements are automatically added / created when the items array is manipulated using <code>push()</code>, <code>slice()</code> or <code>splice</code> methods for example.</p>
+
+<h3 id="context">Context</h3>
+
+<p>A new context is created for each item. These are <a href="http://riotjs.com/api/#tag-instance">tag instances</a>. When loops are nested, all the children tags in the loop inherit any of their parent loop’s properties and methods they themselves have <code>undefined</code>. In this way, Riot avoids overriding things that should not be overridden by the parent tag.</p>
+
+<p>The parent can be explicitly accessed through the <code>parent</code> variable. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;todo&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">each=</span><span class="s">{</span> <span class="na">items</span> <span class="err">}</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;h3&gt;</span>{ title }<span class="nt">&lt;/h3&gt;</span>
+    <span class="nt">&lt;a</span> <span class="na">onclick=</span><span class="s">{</span> <span class="na">parent</span><span class="err">.</span><span class="na">remove</span> <span class="err">}</span><span class="nt">&gt;</span>Remove<span class="nt">&lt;/a&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+
+  this.items = [ { title: 'First' }, { title: 'Second' } ]
+
+  remove(event) {
+
+  }
+<span class="nt">&lt;/todo&gt;</span>
+</code></pre></div>
+<p>In the looped element everything but the <code>each</code> attribute belongs to the child context, so the <code>title</code> can be accessed directly and <code>remove</code> needs to be prefixed with <code>parent.</code> since the method is not a property of the looped item.</p>
+
+<p>The looped items are <a href="http://riotjs.com/api/#tag-instance">tag instances</a>. Riot does not touch the original items so no new properties are added to them.</p>
+
+<h3 id="event-handlers-with-looped-items">Event handlers with looped items</h3>
+
+<p>Event handlers can access individual items in a collection with <code>event.item</code>. Now let’s implement the <code>remove</code> function:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;todo&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">each=</span><span class="s">{</span> <span class="na">items</span> <span class="err">}</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;h3&gt;</span>{ title }<span class="nt">&lt;/h3&gt;</span>
+    <span class="nt">&lt;a</span> <span class="na">onclick=</span><span class="s">{</span> <span class="na">parent</span><span class="err">.</span><span class="na">remove</span> <span class="err">}</span><span class="nt">&gt;</span>Remove<span class="nt">&lt;/a&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+
+  this.items = [ { title: 'First' }, { title: 'Second' } ]
+
+  remove(event) {
+
+    // looped item
+    var item = event.item
+
+    // index on the collection
+    var index = this.items.indexOf(item)
+
+    // remove from collection
+    this.items.splice(index, 1)
+  }
+<span class="nt">&lt;/todo&gt;</span>
+</code></pre></div>
+<p>After the event handler is executed the current tag instance is updated using <code>this.update()</code> (unless you set e.preventUpdate to true in your event handler) which causes all the looped items to execute as well. The parent notices that an item has been removed from the collection and removes the corresponding DOM node from the document.</p>
+
+<h3 id="looping-custom-tags">Looping custom tags</h3>
+
+<p>Custom tags can also be looped. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;todo-item</span> <span class="na">each=</span><span class="s">"{ items }"</span> <span class="na">data=</span><span class="s">"{ this }"</span><span class="nt">&gt;&lt;/todo-item&gt;</span>
+</code></pre></div>
+<p>The currently looped item can be referenced with <code>this</code> which you can use to pass the item as an option to the looped tag.</p>
+
+<h3 id="non-object-arrays">Non-object arrays</h3>
+
+<p>The array elements need not be objects. They can be strings or numbers as well. In this case you need to use the <code>{ name, i in items }</code> construct as follows:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;p</span> <span class="na">each=</span><span class="s">"{ name, i in arr }"</span><span class="nt">&gt;</span>{ i }: { name }<span class="nt">&lt;/p&gt;</span>
+
+  this.arr = [ true, 110, Math.random(), 'fourth']
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p>The <code>name</code> is the name of the element and <code>i</code> is the index number. Both of these labels can be anything that’s best suited for the situation.</p>
+
+<h3 id="object-loops">Object loops</h3>
+
+<p>Plain objects can also be looped. For example:</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;my-tag&gt;</span>
+  <span class="nt">&lt;p</span> <span class="na">each=</span><span class="s">"{ name, value in obj }"</span><span class="nt">&gt;</span>{ name } = { value }<span class="nt">&lt;/p&gt;</span>
+
+  this.obj = {
+    key1: 'value1',
+    key2: 1110.8900,
+    key3: Math.random()
+  }
+<span class="nt">&lt;/my-tag&gt;</span>
+</code></pre></div>
+<p>Object loops are not recommended since internally Riot detects changes on the object with <code>JSON.stringify</code>. The <em>whole</em> object is studied and when there is a change the whole loop is re-rendered. This can be slow. Normal arrays are much faster and only the changes are drawn on the page.</p>
+
+<h2 id="html-elements-as-tags">HTML elements as tags</h2>
+
+<p>Standard HTML elements can be used as riot tags in the page body with the addition of the <code>riot-tag</code> attribute.</p>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;ul</span> <span class="na">riot-tag=</span><span class="s">"my-tag"</span><span class="nt">&gt;&lt;/ul&gt;</span>
+</code></pre></div>
+<p>This provides users with an alternative that can provide greater compatibility with css frameworks.  The tags are treated like any other custom tag.</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="nx">riot</span><span class="p">.</span><span class="nx">mount</span><span class="p">(</span><span class="s1">'my-tag'</span><span class="p">)</span>
+</code></pre></div>
+<p>will mount the <code>ul</code> element shown above as if it were <code>&lt;my-tag&gt;&lt;/my-tag&gt;</code></p>
+
+<h2 id="server-side-rendering">Server-side rendering</h2>
+
+<p>Riot supports server-side rendering with Node/io.js. You can <code>require</code> tags and render them:</p>
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="kd">var</span> <span class="nx">riot</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'riot'</span><span class="p">)</span>
+<span class="kd">var</span> <span class="nx">timer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'timer.tag'</span><span class="p">)</span>
+
+<span class="kd">var</span> <span class="nx">html</span> <span class="o">=</span> <span class="nx">riot</span><span class="p">.</span><span class="nx">render</span><span class="p">(</span><span class="nx">timer</span><span class="p">,</span> <span class="p">{</span> <span class="nx">start</span><span class="o">:</span> <span class="mi">42</span> <span class="p">})</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">html</span><span class="p">)</span> <span class="c1">// &lt;timer&gt;&lt;p&gt;Seconds Elapsed: 42&lt;/p&gt;&lt;/timer&gt;</span>
+</code></pre></div>
+<p>Loops and conditionals <em>are</em> supported.</p>
+
+    </main>
+
+  </div>
+
+  <footer id="footer">
+    <div class="wrap">
+      <a href="http://riotjs.com/"><img src="./Riot.js_guide_files/riot120x.png"></a>
+      <nav>
+  <a href="http://riotjs.com/compare/">Compare</a>
+  <a href="http://riotjs.com/faq/">FAQ</a>
+  <a href="./Riot.js_guide_files/Riot.js_guide.html" class="current">Guide</a>
+  <a href="http://riotjs.com/api/">API</a>
+  <a href="http://riotjs.com/download/">Download</a>
+  <a href="http://riotjs.com/forum/">Forum</a>
+</nav>
+    </div>
+  </footer>
+
+  <script src="./Riot.js_guide_files/script.js"></script>
+
+
+
+
+
+</body><object id="0b3aaa79-190a-a085-9aea-4b8c5b8e82a6" width="0" height="0" type="application/gas-events-cef"></object></html>
