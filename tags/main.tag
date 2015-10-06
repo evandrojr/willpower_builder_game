@@ -13,18 +13,18 @@
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="r in rows">
-        <td>{this.week}</td>
-        <td data-week={this.week} data-day='1'>{this.monday}</td>
-        <td data-week={this.week} data-day='2'>{this.tuesday}</td>
-        <td data-week={this.week} data-day='3'>{this.wednesday}</td>
-        <td data-week={this.week} data-day='4'>{this.thursday}</td>
-        <td data-week={this.week} data-day='5'>{this.friday}</td>
-        <td data-week={this.week} data-day='6'>{this.saturday}</td>
-        <td data-week={this.week} data-day='7'>{this.sunday}</td>
-        <td>{this.total}</td>
-        <td>{this.weight}</td>
-        <td><input type="number" ng-model="weightInput[r.week]" ng-change="setWeight()" width="3" size="3"></td>
+      <tr each={calendar}>
+        <td>{week}</td>
+        <td data-week={this.week} data-day='1'>{monday}</td>
+        <td data-week={this.week} data-day='2'>{tuesday}</td>
+        <td data-week={this.week} data-day='3'>{wednesday}</td>
+        <td data-week={this.week} data-day='4'>{thursday}</td>
+        <td data-week={this.week} data-day='5'>{friday}</td>
+        <td data-week={this.week} data-day='6'>{saturday}</td>
+        <td data-week={this.week} data-day='7'>{sunday}</td>
+        <td>{total}</td>
+        <td>{weight}</td>
+        <td><input type="number"  ng-change="setWeight()" width="3" size="3"></td>
       </tr>
     </tbody>
    </table>
@@ -34,7 +34,7 @@
   <div class="form-group">
     <label class="control-label col-sm-2" for="weekInput">Semana:</label>
     <div class="col-sm-10">
-      <input type="number" name="weekInput" id="weekInput" value="{this.weekInput}" onchange={setWeekInput} placeholder="Digite a semana"></br>
+      <input type="number" name="weekInput" id="weekInput" value={currentWeek} onchange={setWeekInput} placeholder="Digite a semana"></br>
     </div>
   </div>
 
@@ -48,10 +48,10 @@
   </div>
 
   <div class="form-group">
-    <label class="control-label col-sm-2" for="TaskSelector">Atividade:</label>
+    <label class="control-label col-sm-2" for="taskSelector">Atividade:</label>
     <div class="col-sm-10">
-      <select id="TaskSelector" size="15" onchange={setPointsInput} >
-           <option each={tasks} value={id}>{descr}</option>
+      <select id="taskSelector" size="15" onchange={setPointsInput} >
+           <option each={tasks} selected={id == '0'} value={id}>{descr}</option>
       </select>
     </div>
   </div>
@@ -59,20 +59,20 @@
   <div class="form-group">
     <label class="control-label col-sm-2" for="amountInput">Quantidade:</label>
     <div class="col-sm-10">
-      <input type="number" ng-model="amountInput" id="amountInput" ng-change="setPointsInput()">
+      <input type="number" id="amountInput" value="1" onchange={setPointsInput} >
     </div>
   </div>
 
   <div class="form-group">
     <label class="control-label col-sm-2" for="pointsInput">Pontos:</label>
     <div class="col-sm-10">
-      <input type="number" ng-model="pointsInput" id="pointsInput" readonly=true>
+      <input type="number"  id="pointsInput" readonly=true>
     </div>
   </div>
 
 </form>
   <div class="col-sm-4">
-    <button class="btn btn-default" ng-click="addTask()" >
+    <button class="btn btn-default" onclick={addTask} >
       Guardar
     </button>
     <!-- <button class="btn btn-default" ng-click="clearData()" >
@@ -93,8 +93,7 @@
 var v = this;
 var data = new Firebase('https://radiant-torch-5597.firebaseio.com/');
 v.currentWeek = getWeekNumber()
-v.weekInput = v.currentWeek
-v.amountInput.value = 1
+v.weekInput.value = v.currentWeek
 
 // Add new tasks to the end
 // Do not change the order since it task has a hidden id value
@@ -120,7 +119,7 @@ v.tasks=[
   {descr: 'Fazer a ficha completa da academia +10',points: 10},
   {descr: 'Comer sobremesa -5',points: -5},
 ];
-v.dayOfWeekInput = {};
+
 
 v.weekDays = [
     { id: 1, name: 'Segunda' },
@@ -146,29 +145,82 @@ v.weekDays = [
   v.registeredWeeks = [];
   v.today = new Date();
   v.todayDayOfWeek =  ( ((v.today.getDay() + 6) % 7 ) + 1) ; //monday = 1, sunday = 7
+  v.calendar = []
 
   v.dayOfWeekInput.weekDays = v.todayDayOfWeek;
-  v.amountInput = 1;
   v.setWeight = function(){
     week = v.registeredWeeks[this.$index] ;
     v.weekWeight[week]=parseInt(v.weightInput[week]);
     v.saveData();
     console.log(v.weekWeight);
   }
-  loadDataFromFirebase();
 
-//////////////////// Start of Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  v.pointsInput.value = 2 // Should be v.amountInput.value * v.tasks[v.taskSelector.value].points
+  loadDataFromFirebase()
+  renderResults()
+  ///////////////////////////// Start of Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+  setPointsInput(){
+    //TODO make it better!
+    v.pointsInput.value = v.amountInput.value * v.tasks[v.taskSelector.value].points;
+  }
+
+  addTask(){
+   v.dayTasks.push({taskId: parseInt(v.taskSelector.value), week: parseInt(v.weekInput.value), dayOfWeek: parseInt(v.dayOfWeekInput.value), points: parseInt(v.pointsInput.value) });
+   renderResults();
+   //saveData();
+  };
 
   function renderResults(){
     v.dayTasks.sort(compareDayTask);
     setDaySum();
     setRegisteredWeeks();
-    v.rows = [];
+    v.calendar = [];
     console.log(v.registeredWeeks);
     for(var i=0; i < v.registeredWeeks.length; ++i){
-       v.renderWeek(v.registeredWeeks[i]);
+       renderWeek(v.registeredWeeks[i]);
     }
+    v.update()
   }
+
+
+  function sumWeek(week){
+    sum = 0;
+    for (var i = 1; i <= 7; i++){
+      if(v.daySum[week]!==undefined && v.daySum[week][i]!==undefined)
+        sum+=v.daySum[week][i];
+    }
+    return sum;
+  }
+
+  function setDaySum(){
+    v.daySum = [];
+    console.log(v.dayTasks);
+    for (var j = 0; j < v.dayTasks.length; j++){
+      var i = v.dayTasks[j];
+      if(v.daySum[i.week] === undefined)
+        v.daySum[i.week]=[];
+      if(v.daySum[i.week][i.dayOfWeek] === undefined)
+        v.daySum[i.week][i.dayOfWeek]=0;
+      v.daySum[i.week][i.dayOfWeek]+=i.points;
+      console.log(v.daySum[i.week][i.dayOfWeek]);
+     }
+    console.log(v.daySum);
+  };
+
+  function renderWeek(week){
+              v.calendar.push({week: week,
+                      monday: v.daySum[week][1],
+                      tuesday: v.daySum[week][2],
+                      wednesday: v.daySum[week][3],
+                      thursday: v.daySum[week][4],
+                      friday: v.daySum[week][5],
+                      saturday: v.daySum[week][6],
+                      sunday: v.daySum[week][7],
+                      total: sumWeek(week),
+                      weight: v.weekWeight[week]
+                    });
+  };
 
   function setDaySum(){
     v.daySum = [];
@@ -238,7 +290,7 @@ v.weekDays = [
   }
 
   setWeekInput(e) {
-    v.weekInput = e.target.value
+    v.weekInput.value = e.target.value
   }
 
 </main>
