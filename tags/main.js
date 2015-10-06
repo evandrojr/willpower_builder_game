@@ -1,4 +1,4 @@
-riot.tag('main', '<script src="../bower_components/jquery/dist/jquery.min.js" charset="utf-8"></script> <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js" charset="utf-8"></script> <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen" title="no title" charset="utf-8"> <h5>Semana atual: {currentWeek}</h5> <hr> <div class="table-responsive"> <table class="table table-bordered table-hover"> <thead> <tr> <td># semana</td><td>seg</td><td>ter</td><td>qua</td><td>qui</td><td>sex</td><td>sáb</td><td>dom</td><td>total semana</td><td>peso</td> </tr> </thead> <tbody> <tr each="{calendar}"> <td>{week}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="1">{monday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="2">{tuesday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="3">{wednesday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="4">{thursday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="5">{friday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="6">{saturday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="7">{sunday}</td> <td>{total}</td> <td ><input riot-type={"number"} class="col-md-3" onchange="{setWeight}" value="{weight}" size="3"></td> </tr> </tbody> </table> </div> <form class="form-horizontal" role="form"> <div class="form-group"> <label class="control-label col-sm-2" for="weekInput">Semana:</label> <div class="col-sm-10"> <input riot-type={"number"} name="weekInput" id="weekInput" value="{currentWeek}" onchange="{setWeekInput}" placeholder="Digite a semana"></br> </div> </div> <div class="form-group"> <label class="control-label col-sm-2" for="dayOfWeekInput">Dia da semana:</label> <div class="col-sm-10"> <select name="dayOfWeekInput" id="dayOfWeekInput"> <option each="{weekDays}" __selected="{id == todayDayOfWeek}" value="{id}">{name}</option> </select> </div> </div> <div class="form-group"> <label class="control-label col-sm-2" for="taskSelector">Atividade:</label> <div class="col-sm-10"> <select id="taskSelector" size="15" onchange="{setPointsInput}" > <option each="{tasks}" __selected="{id == \'0\'}" value="{id}">{descr}</option> </select> </div> </div> <div class="form-group"> <label class="control-label col-sm-2" for="amountInput">Quantidade:</label> <div class="col-sm-10"> <input riot-type={"number"} id="amountInput" value="1" onchange="{setPointsInput}" > </div> </div> <div class="form-group"> <label class="control-label col-sm-2" for="pointsInput">Pontos:</label> <div class="col-sm-10"> <input riot-type={"number"} id="pointsInput" readonly=true> </div> </div> </form> <div class="col-sm-4"> <button class="btn btn-default" onclick="{addTask}" > Adicionar tarefa </button>  </div> </form>', function(opts) {
+riot.tag('main', '<script src="../bower_components/jquery/dist/jquery.min.js" charset="utf-8"></script> <script src="../bower_components/bootstrap/dist/js/bootstrap.min.js" charset="utf-8"></script> <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css" media="screen" title="no title" charset="utf-8"> <h5>Semana atual: {currentWeek}</h5> <hr> <div class="table-responsive"> <table class="table table-bordered table-hover"> <thead> <tr> <td># semana</td><td>seg</td><td>ter</td><td>qua</td><td>qui</td><td>sex</td><td>sáb</td><td>dom</td><td>total semana</td><td>peso</td> </tr> </thead> <tbody> <tr each="{calendar}"> <td>{week}</td> <td>{monday}<div onmouseenter="{mouseEnterCalendarCell}" onmouseleave="{mouseLeaveCalendarCell}" data-week="{this.week}" data-day="1">&nbsp;</div></td> <td>{tuesday}<div onmouseenter="{mouseEnterCalendarCell}" onmouseleave="{mouseLeaveCalendarCell}" data-week="{this.week}" data-day="2">&nbsp;</div></td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="3">{wednesday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="4">{thursday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="5">{friday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="6">{saturday}</td> <td onmouseover="{mouseOverCalendarCell}" data-week="{this.week}" data-day="7">{sunday}</td> <td>{total}</td> <td ><input riot-type={"number"} class="col-md-3" onchange="{setWeight}" value="{weight}" size="3"></td> </tr> </tbody> </table> </div> <form class="form-horizontal" role="form"> <div class="form-group"> <label class="control-label col-sm-2" for="weekInput">Semana:</label> <div class="col-sm-10"> <input riot-type={"number"} name="weekInput" id="weekInput" value="{currentWeek}" onchange="{setWeekInput}" placeholder="Digite a semana"></br> </div> </div> <div class="form-group"> <label class="control-label col-sm-2" for="dayOfWeekInput">Dia da semana:</label> <div class="col-sm-10"> <select name="dayOfWeekInput" id="dayOfWeekInput"> <option each="{weekDays}" __selected="{id == todayDayOfWeek}" value="{id}">{name}</option> </select> </div> </div> <div class="form-group"> <label class="control-label col-sm-2" for="taskSelector">Atividade:</label> <div class="col-sm-10"> <select id="taskSelector" size="15" onchange="{setPointsInput}" > <option each="{tasks}" __selected="{id == \'0\'}" value="{id}">{descr}</option> </select> </div> </div> <div class="form-group"> <label class="control-label col-sm-2" for="amountInput">Quantidade:</label> <div class="col-sm-10"> <input riot-type={"number"} id="amountInput" value="1" onchange="{setPointsInput}" > </div> </div> <div class="form-group"> <label class="control-label col-sm-2" for="pointsInput">Pontos:</label> <div class="col-sm-10"> <input riot-type={"number"} id="pointsInput" readonly=true> </div> </div> </form> <div class="col-sm-4"> <button class="btn btn-default" onclick="{addTask}" > Adicionar tarefa </button>  </div> </form>', function(opts) {
 
 
 
@@ -217,16 +217,22 @@ v.weekDays = [
     v.weekInput.value = e.target.value
   }.bind(this);
 
-  this.mouseOverCalendarCell = function(e) {
+  this.mouseEnterCalendarCell = function(e) {
       console.log(e.currentTarget)
       var c = e.currentTarget
       console.log($(c).data('day'))
       var day = $(c).data('day')
       var week = $(c).data('week')
-      displayDayActivities(week, day)
+      var a = gatherDayActivities(week, day)
+      $(c).html(a)
   }.bind(this);
 
-  function displayDayActivities(week, day){
+  this.mouseLeaveCalendarCell = function(e) {
+      var c = e.currentTarget
+      $(c).html("&nbsp;")
+  }.bind(this);
+
+  function gatherDayActivities(week, day){
     week = parseInt(week)
     day = parseInt(day)
     var activities = ""
@@ -235,12 +241,13 @@ v.weekDays = [
       if(i.week > week)
         break
       if(i.week == week && i.dayOfWeek == day){
-        activities+=v.tasks[i.taskId].descr + " " + v.tasks[i.taskId].points + "\n";
+        activities+=v.tasks[i.taskId].descr + " " + v.tasks[i.taskId].points + "<BR>"
       }
     }
     console.log(activities)
-    alert(activities)
+    return activities
   }
+
 
 
 });

@@ -15,8 +15,8 @@
     <tbody>
       <tr each={calendar}>
         <td>{week}</td>
-        <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='1'>{monday}</td>
-        <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='2'>{tuesday}</td>
+        <td>{monday}<div onMouseEnter={mouseEnterCalendarCell} onMouseLeave={mouseLeaveCalendarCell} data-week={this.week} data-day='1'>&nbsp;</div></td>
+        <td>{tuesday}<div onMouseEnter={mouseEnterCalendarCell} onMouseLeave={mouseLeaveCalendarCell} data-week={this.week} data-day='2'>&nbsp;</div></td>
         <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='3'>{wednesday}</td>
         <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='4'>{thursday}</td>
         <td onmouseover={mouseOverCalendarCell} data-week={this.week} data-day='5'>{friday}</td>
@@ -310,16 +310,22 @@ v.weekDays = [
     v.weekInput.value = e.target.value
   }
 
-  mouseOverCalendarCell(e) {
+  mouseEnterCalendarCell(e) {
       console.log(e.currentTarget)
       var c = e.currentTarget
       console.log($(c).data('day'))
       var day = $(c).data('day')
       var week = $(c).data('week')
-      displayDayActivities(week, day)
+      var a = gatherDayActivities(week, day)
+      $(c).html(a)
   }
 
-  function displayDayActivities(week, day){
+  mouseLeaveCalendarCell(e) {
+      var c = e.currentTarget
+      $(c).html("&nbsp;")
+  }
+
+  function gatherDayActivities(week, day){
     week = parseInt(week)
     day = parseInt(day)
     var activities = ""
@@ -328,11 +334,12 @@ v.weekDays = [
       if(i.week > week)
         break
       if(i.week == week && i.dayOfWeek == day){
-        activities+=v.tasks[i.taskId].descr + " " + v.tasks[i.taskId].points + "\n";
+        activities+=v.tasks[i.taskId].descr + " " + v.tasks[i.taskId].points + "<BR>"
       }
     }
     console.log(activities)
-    alert(activities)
+    return activities
   }
+
 
 </main>
